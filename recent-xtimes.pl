@@ -3,8 +3,8 @@
 # --------------
 # USAGE:
 #  
-#  recent-ntimes.pl [atime|ctime|mtime] PATH
-#  recent-ntimes.pl PATH  # defaults to 'atime'
+#  recent-xtimes.pl [atime|ctime|mtime] PATH
+#  recent-xtimes.pl PATH  # defaults to 'atime'
 #
 #
 # Note: for accurate atimes, make sure fs is not mounted with 'noatime' or 'relatime'
@@ -29,7 +29,7 @@ $start_dir = dir( $start_dir )->resolve;
 
 my $stat_meth = pop @ARGV || 'atime'; 
 
-die "bad file stat method '$stat_meth' - must me atime, mtime or ctime\n" unless (
+die "bad file stat method '$stat_meth' - must be atime, mtime or ctime\n" unless (
   $stat_meth eq 'atime' ||
   $stat_meth eq 'ctime' ||
   $stat_meth eq 'mtime'
@@ -48,10 +48,10 @@ $start_dir->recurse(
     $c++;
     my $File = shift;
     if (-f $File) {
-      my $ntime = $File->stat->$stat_meth;
+      my $xtime = $File->stat->$stat_meth;
       push @files, {
-        ntime => $ntime,
-        diff => ($now - $ntime),
+        xtime => $xtime,
+        diff => ($now - $xtime),
         file => $File
       };
     }
@@ -75,7 +75,7 @@ print join("\n", '', map {
 
   "[$stat_meth:$dur]  $_->{file}"
 
-} sort { $a->{ntime} <=> $b->{ntime} } @files );
+} sort { $a->{xtime} <=> $b->{xtime} } @files );
 
 print join(' ',"\n\n",(scalar @files),'files',"\n");
 
